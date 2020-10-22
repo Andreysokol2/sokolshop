@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+    <div class="section-top">
+        <img src="https://i.artfile.ru/2048x1258_784185_%5Bwww.ArtFile.ru%5D.jpg" class="img-responsive">
+    </div>
+    <div class="section section1">
+        <div class="container">
+            <div class="row">
+                 <h1 class="text-center">Телефоны</h1>
+                 {% for product_image in products_images_phones %}
+                 {% include 'home/product_item.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="section section2">
+        <img src="https://securenews.ru/wp-content/uploads/2016/06/Apple-cover.jpg" class="img-responsive aple-img">
+    </div>
+    <div class="section section3">
+        <div class="container">
+            <div class="row">
+                 <h1 class="text-center">Ноутбуки</h1>
+                 {% for product_image in products_images_laptops %}
+                 {% include 'home/product_item.html' %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

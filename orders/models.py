@@ -2,11 +2,6 @@ from django.db import models
 from products.models import Product
 from django.db.models.signals import post_save
 
-
-
-
-
-
 class Status(models.Model):
     name = models.CharField(max_length=24, blank=True, null=True, default=None)  # буквенный тип поля
     is_active = models.BooleanField(default=True)
@@ -24,7 +19,7 @@ class Status(models.Model):
         verbose_name = 'Статус'
         verbose_name_plural = 'Статусы заказа'
 class Order(models.Model):
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # total price for all products
+    total_price = models.DecimalField(max_digits=10, decimal_places=3, default=0)  # total price for all products
     customer_name = models.CharField(max_length=64, blank=True, null=True, default=None)  # буквенный тип поля
     customer_email = models.EmailField(blank=True, null=True, default=None)    #поле базы с типом данных почты
     customer_phone = models.CharField(max_length=48, blank=True, null=True, default=None)
@@ -47,13 +42,49 @@ class Order(models.Model):
     def save(self, *args, **kwargs):
         super(Order, self).save(*args, **kwargs)
 
+
+class ProductInBasket(models.Model):
+    session_key = models.CharField(max_length=128, blank=True, null=True, default=None)
+    order = models.ForeignKey(Order, blank=True, null=True, default=None, on_delete=models.CASCADE)   #ссыка
+    product = models.ForeignKey(Product, blank=True, null=True, default=None, on_delete=models.SET_DEFAULT)
+    is_active = models.BooleanField(default=True)
+    nub = models.IntegerField(default=1)
+    price_per_item = models.DecimalField(max_digits=10, decimal_places=3, default=0)
+    total_price = models.DecimalField(max_digits=10, decimal_places=3, default=0)  #price * nub
+    creted = models.DateTimeField(auto_now_add=True, auto_now=False, blank=True, null=True) #время создания
+    updated = models.DateTimeField(auto_now_add=False, auto_now=False, blank=True, null=True)#время обновления
+
+
+
+
+    def __str__(self):
+        return "%s" % self.product
+
+    class Meta:
+        verbose_name = 'Товар в корзине'
+        verbose_name_plural = 'Товары в козине'
+
+    def save(self, *args, **kwargs):
+        if self.product.discount:
+            print("Скидка есть")
+            discount = self.product.discount
+            price_per_item = (self.product.price / 100)*(100 - int(discount))
+        else:
+            print(self.product.price)
+            price_per_item = self.product.price
+        self.price_per_item = price_per_item
+
+        self.total_price = int(self.nub) * self.price_per_item
+
+        super(ProductInBasket, self).save(*args, **kwargs)
+
 class ProductInOrder(models.Model):
     order = models.ForeignKey(Order, blank=True, null=True, default=None, on_delete=models.CASCADE)   #ссыка
     product = models.ForeignKey(Product, blank=True, null=True, default=None, on_delete=models.CASCADE)
     is_active = models.BooleanField(default=True)
     nub = models.IntegerField(default=1)
-    price_per_item = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  #price * nub
+    price_per_item = models.DecimalField(max_digits=10, decimal_places=3, default=0)
+    total_price = models.DecimalField(max_digits=10, decimal_places=3, default=0)  #price * nub
     creted = models.DateTimeField(auto_now_add=True, auto_now=False) #время создания
     updated = models.DateTimeField(auto_now_add=False, auto_now=False)#время обновления
 
@@ -68,13 +99,18 @@ class ProductInOrder(models.Model):
         verbose_name_plural = 'Товары в заказе'
 
     def save(self, *args, **kwargs):
-        price_per_item = self.product.price
-        self.price_per_item = price_per_item
-        self.total_price = self.nub * self.price_per_item
+        if self.product.discount:
+            print("Скидка есть")
+            discount = self.product.discount
+            price_per_item = (self.product.price / 100) * (100 - int(discount))
+        else:
+            price_per_item = self.product.price
+        self.price_per_item = int(price_per_item)
 
-
+        self.total_price = int(self.nub) * self.price_per_item
 
         super(ProductInOrder, self).save(*args, **kwargs)
+
 
 def product_in_order_post_save(sender, instance, created, **kwargs):
     order = instance.order

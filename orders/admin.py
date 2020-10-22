@@ -37,3 +37,12 @@ class StatusAdmin(admin.ModelAdmin):
 
 admin.site.register(Status, StatusAdmin)  # регистрируем модель
 
+class ProductInBasketAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in ProductInBasket._meta.fields]  # какие колонки выводить в админке
+
+    class Meta:
+        model = ProductInBasket
+
+
+admin.site.register(ProductInBasket, ProductInBasketAdmin)  # регистрируем модель
+

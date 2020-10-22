@@ -14,10 +14,10 @@ class ProductCategory(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length=64, blank=True, null=True, default=None)  # буквенный тип поля
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # price * nub
+    price = models.DecimalField(max_digits=10, decimal_places=3,blank=True, null=True, default=0)  # price * nub
     description = models.TextField(blank=True, null=True, default=None)    #описание
     short_description = models.TextField(blank=True, null=True, default=None, max_length=100)  #описание
-    discount = models.IntegerField(blank=True, null=True)
+    discount = models.IntegerField(blank=True, null=True, default=None)
     is_active = models.BooleanField(default=True)
     category = models.ForeignKey(ProductCategory, blank=True, null=True, default=None, on_delete=models.CASCADE)
     creted = models.DateTimeField(auto_now_add=True, auto_now=False) #время создания

@@ -18,6 +18,6 @@ def index(request):
 
 def home(request):
 
-    products_images_sovets = ProductImage.objects.filter(is_active = True, is_main = True, product__category__id = 1)
-    products_images_calls = ProductImage.objects.filter(is_active=True, is_main=True, product__category__id=2)
+    products_images_phones = ProductImage.objects.filter(is_active = True, is_main = True, product__category__id = 3)
+    products_images_laptops = ProductImage.objects.filter(is_active=True, is_main=True, product__category__id=4)
     return render(request, 'home/home.html', locals())
